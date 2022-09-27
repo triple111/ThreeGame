@@ -15,10 +15,17 @@ export class Monster extends Character {
             if(Math.random() < 0.05){ //10% chance to roam
                 this.destX = this.spawner.x + this.getRandomArbitrary(-this.roamradius, this.roamradius+1);
                 this.destY = this.spawner.y + this.getRandomArbitrary(-this.roamradius, this.roamradius+1);
-                console.log(this.sprite.name + ' is roaming to ' + this.destX + ',' + this.destY);
+                //console.log(this.sprite.name + ' is roaming to ' + this.destX + ',' + this.destY);
             }
                 super.move();
         }
+    }
+
+    die(){
+        console.log('killed ' + this.sprite.name);
+        this.spawner.currentmonsters -= 1;
+        this.spawner.region.removeFromScene(this.id);
+        delete this;
     }
 
     getRandomArbitrary(min, max) { //exclusive of max
@@ -45,10 +52,10 @@ export class Spawner{
             for(var n = 0; n < this.maxmonsters - this.currentmonsters; n++){ //adds more monsters if below limit
                 var spawnX = this.x + this.getRandomArbitrary(-this.spawnradius, this.spawnradius+1);
                 var spawnY = this.y + this.getRandomArbitrary(-this.spawnradius, this.spawnradius+1);
-
-                this.region.npcs.push(new Monster(spawnX, spawnY, 0, this.monstertype, this.isRoaming, 5, this));
-                this.region.addToScene(this.region.npcs[this.region.npcs.length - 1].sprite);
-                console.log("Spawned " + this.region.npcs[this.region.npcs.length - 1].sprite.name + " at " + spawnX + ',' + spawnY);
+                var spawnedmonster = new Monster(spawnX, spawnY, 0, this.monstertype, this.isRoaming, 5, this);
+                this.region.addToScene(spawnedmonster.sprite);
+                this.region.npcMap.set(spawnedmonster.sprite.id, spawnedmonster);
+                console.log("Spawned " + this.region.npcMap.get(spawnedmonster.sprite.id).sprite.name + this.region.npcMap.get(spawnedmonster.sprite.id).sprite.id  + " at " + spawnX + ',' + spawnY);
             }
             this.currentmonsters = this.maxmonsters;
         }

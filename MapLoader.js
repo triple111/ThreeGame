@@ -8,9 +8,9 @@ export class MapLoader {
         this.worldmesh;
         this.roofs;
         this.worldtexture;
-        this.worldmaterial = new THREE.MeshBasicMaterial();
+        this.worldmaterial = new THREE.MeshStandardMaterial();
         this.mastertexture;
-        this.mastermaterial = new THREE.MeshBasicMaterial();
+        this.mastermaterial = new THREE.MeshStandardMaterial();
         this.addToScene = addToScene;
         this.parser = new DOMParser();
         this.mapFile;

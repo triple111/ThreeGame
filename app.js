@@ -28,6 +28,8 @@ const pointer = new THREE.Vector2();
 const cameracenter = new THREE.Vector2();
 cameracenter.x = 0;
 cameracenter.y = 0;
+const clock = new THREE.Clock();
+var deltaTime;
 /*
 const labelRenderer = new CSS2DRenderer();
 labelRenderer.setSize( window.innerWidth, window.innerHeight );
@@ -55,7 +57,7 @@ const currentKeysPressed = {};
 //---------------FUNCTIONS---------------
 function intializeWorld() {
     
-    currentregion = new Region(addToScene);
+    currentregion = new Region(addToScene, removeFromScene);
     maploader.loadMapFile(currentregion);
 }
 /*
@@ -69,12 +71,20 @@ function addToScene(gameObject) { // used for callbacks to add to scene
     scene.add(gameObject);
 }
 
+function removeFromScene(id){
+    var gameObject = scene.getObjectById(id);
+    scene.remove(gameObject);
+}
+
 
 function main() {
 
     renderer.setSize(renderwidth, renderheight);
     gameinterface.initialize(document);
     boom.add(camera);
+
+    const light = new THREE.AmbientLight( 0xEEEEEE ); // soft white light
+    scene.add( light );
 
     camera.position.z = 5;
     camera.position.x = 0;
@@ -124,7 +134,7 @@ function updatePlayers(){
 }
 
 function updateRegion(){
-    currentregion.update();    
+    currentregion.update(tick);    
 }
 
 function onKeyPress(event) {
@@ -183,12 +193,19 @@ function onPointerMove(event) {
 }
 
 function onClick(event){
-    var tilecoords = raycastToTileCoords(intersects[0])
-    console.log('clicked' + intersects[0].object.name + ' at ' + tilecoords.x + "," + tilecoords.y);
-    player.setDestination(tilecoords.x,tilecoords.y);
-    //console.log('new dest:' + player.destX + ',' + player.destY);
-    boom.position.copy(player.sprite.position);
-    statusbox.innerHTML = player.destX + ',' + player.destY;
+    if( intersects[0].object.name == 'groundplane'){
+        var tilecoords = raycastToTileCoords(intersects[0])
+        console.log('clicked' + intersects[0].object.name + ' at ' + tilecoords.x + "," + tilecoords.y);
+        player.setDestination(tilecoords.x,tilecoords.y);
+        //console.log('new dest:' + player.destX + ',' + player.destY);
+        boom.position.copy(player.sprite.position);
+        statusbox.innerHTML = player.destX + ',' + player.destY;
+    }
+
+    var target = intersects[0].object;
+    if( target.name == 'goblin'){
+        currentregion.npcMap.get(target.id).die();
+    }
 
 }
 
@@ -223,13 +240,16 @@ window.setInterval(serverTick,600);
 function loop() {
 
     window.requestAnimationFrame(loop);
+
+    deltaTime = clock.getDelta();
+    infobox.innerHTML = deltaTime;
     checkKeys();
 
     raycaster.setFromCamera(pointer, camera);
     intersects = raycaster.intersectObjects(scene.children);
     for (let i = 0; i < intersects.length; i++) {
         //console.log(intersects[i].object.id);
-        infobox.innerHTML = intersects[0].object.name + ',' + intersects[0].object.id;
+        //infobox.innerHTML = intersects[0].object.name + ',' + intersects[0].object.id;
     }
 
     //remove roofs

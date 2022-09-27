@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.9" tiledversion="1.9.1" name="tileobjects" tilewidth="15" tileheight="15" tilecount="4" columns="0">
+<tileset version="1.9" tiledversion="1.9.2" name="tileobjects" tilewidth="15" tileheight="15" tilecount="5" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="1">
   <image width="15" height="15" source="mapicons/rock1.png"/>
@@ -18,5 +18,8 @@
    <property name="spawnradius" type="int" value="0"/>
   </properties>
   <image width="15" height="15" source="mapicons/spawner.png"/>
+ </tile>
+ <tile id="5">
+  <image width="15" height="15" source="../grave1.png"/>
  </tile>
 </tileset>

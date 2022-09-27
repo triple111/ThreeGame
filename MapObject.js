@@ -1,4 +1,5 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.120.0/build/three.module.js'
+import { LitSpriteMaterial } from '/LitSpriteMaterial.js';
 
 export class MapObject {
     constructor(x, y, z, name) {

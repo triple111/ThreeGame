@@ -2,11 +2,12 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.120.0/build/three.module.js';
 import { Text } from 'https://cdn.skypack.dev/troika-three-text@0.30.2/src/Text.js';
 import { Region } from './Region.js';
-import { Character } from '/character.js';
+import { Character, Player } from '/character.js';
 import { Monster, Spawner } from '/monster.js';
 import { MapLoader } from '/maploader.js';
 import { Interface } from '/interface.js';
-import { CSS2DRenderer, CSS2DObject} from 'https://cdn.skypack.dev/three@0.136.0/examples/jsm/renderers/CSS2DRenderer.js';
+import { CSS2DRenderer, CSS2DObject } from 'https://cdn.skypack.dev/three@0.136.0/examples/jsm/renderers/CSS2DRenderer.js';
+import { ResourceManager } from '/ResourceManager.js';
 
 //---------------GAME WINDOW VARIABLES-----------------
 const canvas = document.querySelector('#c');
@@ -20,14 +21,22 @@ renderer.antialias = false;
 const scene = new THREE.Scene();
 const width = 15;
 const height = 10;
-const camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, .001, 1000);
+const cameradistance = 15;
+scene.fog = new THREE.Fog(0x000000, cameradistance + 13, cameradistance + 20);
+//scene.fog = new THREE.FogExp2(0x000000, 0.03);
+const ocamera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, .001, 100);
+const pcamera = new THREE.PerspectiveCamera(30, width / height, 0.1, 100);
+const camera = pcamera;
 const fontloader = new THREE.FontLoader();
 //const gamefont = fontloader.load('resource/font/gamefont.json');
 const raycaster = new THREE.Raycaster();
-const pointer = new THREE.Vector2();    
+const pointer = new THREE.Vector2();
 const cameracenter = new THREE.Vector2();
 cameracenter.x = 0;
 cameracenter.y = 0;
+const maxcameraangle = 5;
+const mincameraangle = 5;
+const upVector = new THREE.Vector3(0, 0, 1);
 const clock = new THREE.Clock();
 var deltaTime;
 /*
@@ -40,23 +49,21 @@ document.body.appendChild( labelRenderer.domElement );
 const gameinterface = new Interface(addToScene, canvas);
 //---------------WORLD OBJECT VARIABLES-----------------
 var intersects;
+const rm = new ResourceManager(); //loads all the textures and stuff
 const maploader = new MapLoader(addToScene);
 const boom = new THREE.Group()
-const player = new Character(2, 0, 0, 'player');
+const player = new Player(2, 0, 0, 'player');
 var currentregion;
 var players = [];
 players.push(player);
 
 //---------------OTHER VARIABLES-----------------
-var tick=0;
+var tick = 0;
 const currentKeysPressed = {};
-
-
-
 
 //---------------FUNCTIONS---------------
 function intializeWorld() {
-    
+    //rm.loadTextures
     currentregion = new Region(addToScene, removeFromScene);
     maploader.loadMapFile(currentregion);
 }
@@ -71,7 +78,7 @@ function addToScene(gameObject) { // used for callbacks to add to scene
     scene.add(gameObject);
 }
 
-function removeFromScene(id){
+function removeFromScene(id) {
     var gameObject = scene.getObjectById(id);
     scene.remove(gameObject);
 }
@@ -83,58 +90,71 @@ function main() {
     gameinterface.initialize(document);
     boom.add(camera);
 
-    const light = new THREE.AmbientLight( 0xEEEEEE ); // soft white light
-    scene.add( light );
+    const light = new THREE.AmbientLight(0xEEEEEE); // soft white light
+    scene.add(light);
 
-    camera.position.z = 5;
+    const plight = new THREE.PointLight(0xff0000, 1, 10);
+    plight.position.set(18, 10, 2);
+    //scene.add(plight);
+
+    //camera.position.z = 5;
     camera.position.x = 0;
-    camera.position.y = -10;
+    camera.position.y = -cameradistance;
     camera.lookAt(0, 0, 0);
-    //boom.rotateX( THREE.Math.degToRad(-30));
+    boom.rotateX(THREE.Math.degToRad(-30));
 
     const axesHelper = new THREE.AxesHelper(5);
     scene.add(axesHelper);
 
-   
+
 
 
     player.name = "player";
     scene.add(player.sprite);
     //scene.add(sword.sprite);
-   
+
 
     scene.add(boom);
     boom.position.copy(player.sprite.position);
 
     //const light = new THREE.AmbientLight(0xffffff, 1);
     // scene.add(light);
-/*
-    const atext = new Text();
-    scene.add(atext);
-    atext.text = 'Greater Demon';
-    atext.fontSize = 0.3;
-    //atext.font = gamefont;
-    atext.position.copy(demon.sprite.position);
-    atext.position.z = 2.5;
-    atext.rotation.x = THREE.Math.degToRad(90);
-    atext.anchorX = 'center';
-    */
+    /*
+        const atext = new Text();
+        scene.add(atext);
+        atext.text = 'Greater Demon';
+        atext.fontSize = 0.3;
+        //atext.font = gamefont;
+        atext.position.copy(demon.sprite.position);
+        atext.position.z = 2.5;
+        atext.rotation.x = THREE.Math.degToRad(90);
+        atext.anchorX = 'center';
+        */
     //atext.material = new THREE.SpriteMaterial();
     renderer.render(scene, camera);
 
 }
 
-function updatePlayers(){
-    for(var i = 0; i<players.length;i++){
-        if(players[i].isMoving = true){
+function updatePlayers() {
+    for (var i = 0; i < players.length; i++) {
+        if (players[i].isMoving = true) {
             players[i].move();
         }
     }
     boom.position.copy(player.sprite.position);
 }
 
-function updateRegion(){
-    currentregion.update(tick);    
+function animatePlayers() {
+    for (var i = 0; i < players.length; i++) {
+        if (players[i].isMoving = true) {
+            //players[i].smoothmove(deltaTime);
+        }
+    }
+    boom.position.copy(player.sprite.position);
+}
+
+function updateRegion() {
+    currentregion.update(tick);
 }
 
 function onKeyPress(event) {
@@ -145,11 +165,17 @@ function onKeyUp(event) {
     currentKeysPressed[event.key] = false;
 }
 
-function checkKeys() {
-    if (currentKeysPressed["ArrowLeft"] == true) boom.rotation.z -= 0.05;
-    if (currentKeysPressed["ArrowRight"] == true) boom.rotation.z +=0.05;
-    if (currentKeysPressed["ArrowUp"] == true) boom.rotateX(-0.05); //not working
-    if (currentKeysPressed["ArrowDown"] == true) boom.rotateX(0.05); //not working
+function checkKeys() { //todo clamp rotation
+    if (currentKeysPressed["ArrowLeft"] == true) boom.rotateOnWorldAxis(upVector, -0.025);
+    if (currentKeysPressed["ArrowRight"] == true) boom.rotateOnWorldAxis(upVector, 0.025);
+    if (currentKeysPressed["ArrowUp"] == true) {
+        boom.rotateX(-0.025);
+        console.log(THREE.Math.radToDeg(boom.rotation.x));
+    }
+    if (currentKeysPressed["ArrowDown"] == true) {
+        boom.rotateX(0.025)
+        console.log(THREE.Math.radToDeg(boom.rotation.x));
+    }
 }
 
 
@@ -192,24 +218,24 @@ function onPointerMove(event) {
     pointer.y = -((event.clientY - rect.top) / renderheight) * 2 + 1;
 }
 
-function onClick(event){
-    if( intersects[0].object.name == 'groundplane'){
+function onClick(event) {
+    if (intersects[0].object.name == 'groundplane') {
         var tilecoords = raycastToTileCoords(intersects[0])
         console.log('clicked' + intersects[0].object.name + ' at ' + tilecoords.x + "," + tilecoords.y);
-        player.setDestination(tilecoords.x,tilecoords.y);
-        //console.log('new dest:' + player.destX + ',' + player.destY);
+        player.setDestination(tilecoords.x, tilecoords.y, tick);
+        //console.log('new dest:' + player.destination.x + ',' + player.destination.y);
         boom.position.copy(player.sprite.position);
-        statusbox.innerHTML = player.destX + ',' + player.destY;
+        statusbox.innerHTML = player.destination.x + ',' + player.destination.y;
     }
 
     var target = intersects[0].object;
-    if( target.name == 'goblin'){
+    if (target.name == 'goblin') {
         currentregion.npcMap.get(target.id).die();
     }
 
 }
 
-function raycastToTileCoords(target){
+function raycastToTileCoords(target) {
     var intersectVector3 = target.point;
     var tileX = Math.floor(intersectVector3.x);
     var tileY = Math.floor(intersectVector3.y);
@@ -226,6 +252,7 @@ function getRandomArbitrary(min, max) {
 //function
 
 setupKeyControls();
+
 main();
 intializeWorld();
 window.addEventListener('keydown', onKeyPress);
@@ -234,14 +261,14 @@ window.addEventListener('pointermove', onPointerMove);
 window.addEventListener('click', onClick);
 
 window.requestAnimationFrame(loop);
-window.setInterval(serverTick,600);
+window.setInterval(serverTick, 600);
 
 
 function loop() {
 
     window.requestAnimationFrame(loop);
 
-    deltaTime = clock.getDelta();
+    deltaTime = clock.getElapsedTime();
     infobox.innerHTML = deltaTime;
     checkKeys();
 
@@ -255,18 +282,20 @@ function loop() {
     //remove roofs
     raycaster.setFromCamera(cameracenter, camera);
     var camintersects = raycaster.intersectObjects(scene.children);
-    if(camintersects[0] != undefined){
-        if(camintersects[0].object.name == "roofs") {
-        maploader.roofs.visible = false;
-        }
-        else{
+    if (camintersects[0] != undefined) {
+        if (camintersects[0].object.name == "roofs") {
+            maploader.roofs.visible = false;
+        } else {
             maploader.roofs.visible = true;
         }
-    }   
+    }
+
+    animatePlayers();
     renderer.render(scene, camera);
 }
 
-function serverTick(){
+function serverTick() {
+    clock.start();
     tick++;
     tickbox.innerHTML = tick;
     updatePlayers();

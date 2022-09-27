@@ -44,20 +44,20 @@ export class MapLoader {
             gltf.scene.traverse((o) => {
                 if (o.isMesh) {
                     if (o.name == 'groundplane') {
-                        o.material = self.worldmaterial;                  
+                        o.material = self.worldmaterial;
                     } else {
                         o.material = self.mastermaterial;
                     }
                 }
             });
-            
-        self.worldmesh = gltf.scene;
-        self.worldmesh.traverse(function(child){
-            //console.log(child.name);
-            if(child.name == "roofs") self.roofs = child;
-            self.addToScene(child);
-        })
-        //self.addToScene(self.worldmesh);
+
+            self.worldmesh = gltf.scene;
+            self.worldmesh.traverse(function(child) {
+                    //console.log(child.name);
+                    if (child.name == "roofs") self.roofs = child;
+                    self.addToScene(child);
+                })
+                //self.addToScene(self.worldmesh);
 
         }, undefined, function(error) {
 
@@ -95,15 +95,15 @@ export class MapLoader {
 
                 var properties = resourcelist[i].getElementsByTagName('property');
                 //get properties of resource
-                for(var o = 0; o < properties.length; o++){
-                    switch(properties[o].getAttribute('name')){
+                for (var o = 0; o < properties.length; o++) {
+                    switch (properties[o].getAttribute('name')) {
                         case 'type':
-                        name = properties[o].getAttribute('value');
-                        break;
+                            name = properties[o].getAttribute('value');
+                            break;
                     }
                 }
-            mapResources[i] = new MapObject(xPosition, yPosition, zPosition, name);
-            
+                mapResources[i] = new MapObject(xPosition, yPosition, zPosition, name);
+
             } catch (error) {
                 console.log("Couldn't find a tree");
             }
@@ -114,7 +114,7 @@ export class MapLoader {
         }
     }
 
-    loadSpawners(region){
+    loadSpawners(region) {
         var mapSpawners = [];
         var spawnerlist = this.mapFile.getElementsByClassName("spawner");
 
@@ -123,7 +123,7 @@ export class MapLoader {
             try {
                 var xPosition = spawnerlist[i].getAttribute('x') / 15;
                 var yPosition = (64 - spawnerlist[i].getAttribute('y') / 15); //flips due to tiled export order
-              
+
                 var zPosition = 0;
                 var monstertype;
                 var spawnradius;
@@ -132,29 +132,29 @@ export class MapLoader {
 
                 var properties = spawnerlist[i].getElementsByTagName('property');
                 //get properties of resource
-                for(var o = 0; o < properties.length; o++){
-                    switch(properties[o].getAttribute('name')){
+                for (var o = 0; o < properties.length; o++) {
+                    switch (properties[o].getAttribute('name')) {
                         case 'isRoaming':
                             isRoaming = properties[o].getAttribute('value');
-                        break;
+                            break;
                         case 'maxmonsters':
                             maxmonsters = properties[o].getAttribute('value');
-                        break;
+                            break;
                         case 'monstertype':
                             monstertype = properties[o].getAttribute('value');
-                        break;
+                            break;
                         case 'spawnradius':
                             spawnradius = properties[o].getAttribute('value');
-                        break;
+                            break;
                     }
                 }
-            mapSpawners[i] = new Spawner(xPosition, yPosition, zPosition, monstertype, spawnradius,maxmonsters, isRoaming, region);
-            console.log("new spawner at: " + mapSpawners[i].x + ',' + mapSpawners[i].y);
-        } catch (error) {
+                mapSpawners[i] = new Spawner(xPosition, yPosition, zPosition, monstertype, spawnradius, maxmonsters, isRoaming, region);
+                //console.log("new spawner at: " + mapSpawners[i].x + ',' + mapSpawners[i].y);
+            } catch (error) {
                 console.log("Couldn't find a spawner");
             }
         }
-            region.spawners = mapSpawners;
+        region.spawners = mapSpawners;
     }
 
     loadCharacters() {

@@ -49,8 +49,7 @@ document.body.appendChild( labelRenderer.domElement );
 const gameinterface = new Interface(addToScene, canvas);
 //---------------WORLD OBJECT VARIABLES-----------------
 var intersects;
-const rm = new ResourceManager(); //loads all the textures and stuff
-const maploader = new MapLoader(addToScene);
+const rm = new ResourceManager(addToScene, removeFromScene, main, startloop); //loads all the textures and stuff
 const boom = new THREE.Group()
 const player = new Player(2, 0, 0, 'player');
 var currentregion;
@@ -63,9 +62,8 @@ const currentKeysPressed = {};
 
 //---------------FUNCTIONS---------------
 function intializeWorld() {
-    //rm.loadTextures
-    currentregion = new Region(addToScene, removeFromScene);
-    maploader.loadMapFile(currentregion);
+    rm.loadGame(0);
+
 }
 /*
 function drawWorld() {
@@ -85,7 +83,7 @@ function removeFromScene(id) {
 
 
 function main() {
-
+    currentregion = rm.regions[0];
     renderer.setSize(renderwidth, renderheight);
     gameinterface.initialize(document);
     boom.add(camera);
@@ -170,11 +168,11 @@ function checkKeys() { //todo clamp rotation
     if (currentKeysPressed["ArrowRight"] == true) boom.rotateOnWorldAxis(upVector, 0.025);
     if (currentKeysPressed["ArrowUp"] == true) {
         boom.rotateX(-0.025);
-        console.log(THREE.Math.radToDeg(boom.rotation.x));
+        //console.log(THREE.Math.radToDeg(boom.rotation.x));
     }
     if (currentKeysPressed["ArrowDown"] == true) {
         boom.rotateX(0.025)
-        console.log(THREE.Math.radToDeg(boom.rotation.x));
+            //console.log(THREE.Math.radToDeg(boom.rotation.x));
     }
 }
 
@@ -251,17 +249,22 @@ function getRandomArbitrary(min, max) {
 
 //function
 
+
+//main();
+intializeWorld();
 setupKeyControls();
 
-main();
-intializeWorld();
 window.addEventListener('keydown', onKeyPress);
 window.addEventListener('keyup', onKeyUp);
 window.addEventListener('pointermove', onPointerMove);
 window.addEventListener('click', onClick);
 
-window.requestAnimationFrame(loop);
+
 window.setInterval(serverTick, 600);
+
+function startloop() {
+    window.requestAnimationFrame(loop);
+}
 
 
 function loop() {
@@ -284,9 +287,9 @@ function loop() {
     var camintersects = raycaster.intersectObjects(scene.children);
     if (camintersects[0] != undefined) {
         if (camintersects[0].object.name == "roofs") {
-            maploader.roofs.visible = false;
+            rm.roofs.visible = false;
         } else {
-            maploader.roofs.visible = true;
+            rm.roofs.visible = true;
         }
     }
 
@@ -299,5 +302,5 @@ function serverTick() {
     tick++;
     tickbox.innerHTML = tick;
     updatePlayers();
-    updateRegion();
+    //updateRegion();
 }

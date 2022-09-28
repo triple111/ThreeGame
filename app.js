@@ -49,9 +49,9 @@ document.body.appendChild( labelRenderer.domElement );
 const gameinterface = new Interface(addToScene, canvas);
 //---------------WORLD OBJECT VARIABLES-----------------
 var intersects;
-const rm = new ResourceManager(addToScene, removeFromScene, main, startloop); //loads all the textures and stuff
+const rm = new ResourceManager(addToScene, removeFromScene, main); //loads all the textures and stuff
 const boom = new THREE.Group()
-const player = new Player(2, 0, 0, 'player');
+const player = new Player(28, 20, 0, 'player');
 var currentregion;
 var players = [];
 players.push(player);
@@ -60,77 +60,90 @@ players.push(player);
 var tick = 0;
 const currentKeysPressed = {};
 
+//---------------ENTRY POINT---------------
+
+initializeInterface();
+initializeWorld();
+
 //---------------FUNCTIONS---------------
-function intializeWorld() {
-    rm.loadGame(0);
-
-}
-/*
-function drawWorld() {
-    for (var i = 0; i < maploader.mapObjects.length; i++) {
-        scene.add(maploader.mapObjects[i].sprite);
-    }
-}
-*/
-function addToScene(gameObject) { // used for callbacks to add to scene
-    scene.add(gameObject);
-}
-
-function removeFromScene(id) {
-    var gameObject = scene.getObjectById(id);
-    scene.remove(gameObject);
-}
-
-
-function main() {
-    currentregion = rm.regions[0];
+function initializeInterface(){
     renderer.setSize(renderwidth, renderheight);
     gameinterface.initialize(document);
     boom.add(camera);
-
-    const light = new THREE.AmbientLight(0xEEEEEE); // soft white light
-    scene.add(light);
-
-    const plight = new THREE.PointLight(0xff0000, 1, 10);
-    plight.position.set(18, 10, 2);
-    //scene.add(plight);
-
-    //camera.position.z = 5;
+    scene.add(boom);
     camera.position.x = 0;
     camera.position.y = -cameradistance;
     camera.lookAt(0, 0, 0);
     boom.rotateX(THREE.Math.degToRad(-30));
 
+}
+
+function initializeWorld() {
+    rm.loadGame(0);
+    //--------TESTING--------
+    const light = new THREE.AmbientLight(0xEEEEEE); // soft white light
+    const plight = new THREE.PointLight(0xff0000, 1, 10);
+    plight.position.set(18, 10, 2);
+    scene.add(light);
+    //scene.add(plight);
     const axesHelper = new THREE.AxesHelper(5);
     scene.add(axesHelper);
 
+}
 
-
-
-    player.name = "player";
+function main() {
+    console.log("Main");
+    currentregion = rm.regions[0];
     scene.add(player.sprite);
-    //scene.add(sword.sprite);
-
-
-    scene.add(boom);
     boom.position.copy(player.sprite.position);
 
-    //const light = new THREE.AmbientLight(0xffffff, 1);
-    // scene.add(light);
-    /*
-        const atext = new Text();
-        scene.add(atext);
-        atext.text = 'Greater Demon';
-        atext.fontSize = 0.3;
-        //atext.font = gamefont;
-        atext.position.copy(demon.sprite.position);
-        atext.position.z = 2.5;
-        atext.rotation.x = THREE.Math.degToRad(90);
-        atext.anchorX = 'center';
-        */
-    //atext.material = new THREE.SpriteMaterial();
     renderer.render(scene, camera);
 
+    window.addEventListener('keydown', onKeyPress);
+    window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('click', onClick);
+    window.setInterval(serverTick, 600);
+    window.requestAnimationFrame(loop);
+}
+
+function loop() {
+
+    window.requestAnimationFrame(loop);
+
+    deltaTime = clock.getElapsedTime();
+    infobox.innerHTML = deltaTime;
+    checkKeys(); //check to see if any keys are down
+
+    //raycast to get mouse clicks
+    raycaster.setFromCamera(pointer, camera);
+    intersects = raycaster.intersectObjects(scene.children);
+    for (let i = 0; i < intersects.length; i++) {
+        //console.log(intersects[i].object.id);
+        //infobox.innerHTML = intersects[0].object.name + ',' + intersects[0].object.id;
+    }
+
+    //raycast to remove roofs
+    raycaster.setFromCamera(cameracenter, camera);
+    var camintersects = raycaster.intersectObjects(scene.children);
+    if (camintersects[0] != undefined) {
+        if (camintersects[0].object.name == "roofs") {
+            rm.roofs.visible = false;
+        } else {
+            rm.roofs.visible = true;
+        }
+    }
+
+    //animatePlayers();
+    renderer.render(scene, camera);
+}
+
+function serverTick() {
+    clock.start();
+    tick++;
+    tickbox.innerHTML = tick;
+    updatePlayers();
+    updateRegion();
 }
 
 function updatePlayers() {
@@ -176,8 +189,7 @@ function checkKeys() { //todo clamp rotation
     }
 }
 
-
-function setupKeyControls() {
+/* function setupKeyControls() {
     document.onkeydown = function(e) {
         switch (e.keyCode) {
             case 187: //+
@@ -206,7 +218,7 @@ function setupKeyControls() {
         renderer.render(scene, camera);
     };
 }
-
+ */
 function onPointerMove(event) {
     // calculate pointer position in normalized device coordinates
     // (-1 to +1) for both components
@@ -245,62 +257,15 @@ function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
 
-//function 
 
-//function
+function addToScene(gameObject) { // used for callbacks to add to scene
+    scene.add(gameObject);
+}
 
-
-//main();
-intializeWorld();
-setupKeyControls();
-
-window.addEventListener('keydown', onKeyPress);
-window.addEventListener('keyup', onKeyUp);
-window.addEventListener('pointermove', onPointerMove);
-window.addEventListener('click', onClick);
-
-
-window.setInterval(serverTick, 600);
-
-function startloop() {
-    window.requestAnimationFrame(loop);
+function removeFromScene(id) {
+    var gameObject = scene.getObjectById(id);
+    scene.remove(gameObject);
 }
 
 
-function loop() {
 
-    window.requestAnimationFrame(loop);
-
-    deltaTime = clock.getElapsedTime();
-    infobox.innerHTML = deltaTime;
-    checkKeys();
-
-    raycaster.setFromCamera(pointer, camera);
-    intersects = raycaster.intersectObjects(scene.children);
-    for (let i = 0; i < intersects.length; i++) {
-        //console.log(intersects[i].object.id);
-        //infobox.innerHTML = intersects[0].object.name + ',' + intersects[0].object.id;
-    }
-
-    //remove roofs
-    raycaster.setFromCamera(cameracenter, camera);
-    var camintersects = raycaster.intersectObjects(scene.children);
-    if (camintersects[0] != undefined) {
-        if (camintersects[0].object.name == "roofs") {
-            rm.roofs.visible = false;
-        } else {
-            rm.roofs.visible = true;
-        }
-    }
-
-    animatePlayers();
-    renderer.render(scene, camera);
-}
-
-function serverTick() {
-    clock.start();
-    tick++;
-    tickbox.innerHTML = tick;
-    updatePlayers();
-    //updateRegion();
-}

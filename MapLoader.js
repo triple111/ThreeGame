@@ -5,45 +5,11 @@ import { Monster, Spawner } from '/monster.js';
 export class MapLoader {
     constructor(rm, addToScene) {
         this.rm = rm;
-        this.worldmesh;
-        this.roofs;
         this.addToScene = addToScene;
         this.parser = new DOMParser();
         this.mapFile;
-        //this.loadMapTextures();
-        // this.loadWorldGeometry()
     }
 
-    /*
-        loadWorldGeometry() {
-            var self = this;
-            const loader = new GLTFLoader().load('resource/world.glb', function(gltf) {
-                gltf.scene.position.set(0, 0, 0);
-                gltf.scene.traverse((o) => {
-                    if (o.isMesh) {
-                        if (o.name == 'groundplane') {
-                            o.material = self.worldmaterial;
-                        } else {
-                            o.material = self.mastermaterial;
-                        }
-                    }
-                });
-
-                self.worldmesh = gltf.scene;
-                self.worldmesh.traverse(function(child) {
-                        //console.log(child.name);
-                        if (child.name == "roofs") self.roofs = child;
-                        self.addToScene(child);
-                    })
-                    //self.addToScene(self.worldmesh);
-
-            }, undefined, function(error) {
-
-                console.error(error);
-
-            });
-        }
-    */
     loadMapFile(region) {
         var client = new XMLHttpRequest();
         var self = this;
@@ -52,16 +18,16 @@ export class MapLoader {
         client.onreadystatechange = function() {
             if (client.readyState == 4 && client.status == 200) {
                 self.mapFile = self.parser.parseFromString(client.responseText, "text/xml");
-                self.loadMapResources();
+                self.loadMapResources(region);
                 self.loadSpawners(region);
             }
         }
         client.send();
     }
 
-    loadMapResources(xmltext) {
+    loadMapResources(region) {
         var mapResources = [];
-        var resourcelist = this.mapFile.getElementsByClassName("tree");
+        var resourcelist = this.mapFile.getElementsByClassName("object");
 
         //load resources
         for (var i = 0; i < resourcelist.length; i++) {
@@ -87,8 +53,9 @@ export class MapLoader {
             }
         }
         //add all mapResources to scene
-        for (var i = 0; i < mapResources.length; i++) {
-            this.addToScene(mapResources[i].sprite);
+        region.resources = mapResources;
+        for (var i = 0; i < region.resources.length; i++) {
+            this.addToScene(region.resources[i].sprite);
         }
     }
 

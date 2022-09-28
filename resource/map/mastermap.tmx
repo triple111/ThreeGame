@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="15" tileheight="15" infinite="0" nextlayerid="13" nextobjectid="29">
+<map version="1.9" tiledversion="1.9.1" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="15" tileheight="15" infinite="0" nextlayerid="13" nextobjectid="29">
  <tileset firstgid="1" source="mastertex.tsx"/>
  <tileset firstgid="4097" source="tileobjects.tsx"/>
  <layer id="1" name="Grass" width="64" height="64">
@@ -343,37 +343,69 @@
 </data>
  </layer>
  <objectgroup id="12" name="Objects">
-  <object id="21" class="grave1" gid="4102" x="570" y="450" width="15" height="15"/>
-  <object id="22" class="grave1" gid="4102" x="600" y="450" width="15" height="15"/>
-  <object id="23" class="grave1" gid="4102" x="555" y="510" width="15" height="15"/>
-  <object id="24" class="grave1" gid="4102" x="555" y="480" width="15" height="15"/>
-  <object id="25" class="grave1" gid="4102" x="585" y="480" width="15" height="15"/>
-  <object id="26" class="grave1" gid="4102" x="600" y="510" width="15" height="15"/>
-  <object id="27" class="grave1" gid="4102" x="615" y="480" width="15" height="15"/>
-  <object id="28" class="grave1" gid="4102" x="630" y="450" width="15" height="15"/>
+  <object id="21" class="object" gid="4102" x="570" y="450" width="15" height="15">
+   <properties>
+    <property name="type" value="grave1"/>
+   </properties>
+  </object>
+  <object id="22" class="object" gid="4102" x="600" y="450" width="15" height="15">
+   <properties>
+    <property name="type" value="grave1"/>
+   </properties>
+  </object>
+  <object id="23" class="object" gid="4102" x="555" y="510" width="15" height="15">
+   <properties>
+    <property name="type" value="grave1"/>
+   </properties>
+  </object>
+  <object id="24" class="object" gid="4102" x="555" y="480" width="15" height="15">
+   <properties>
+    <property name="type" value="grave1"/>
+   </properties>
+  </object>
+  <object id="25" class="object" gid="4102" x="585" y="480" width="15" height="15">
+   <properties>
+    <property name="type" value="grave1"/>
+   </properties>
+  </object>
+  <object id="26" class="object" gid="4102" x="600" y="510" width="15" height="15">
+   <properties>
+    <property name="type" value="grave1"/>
+   </properties>
+  </object>
+  <object id="27" class="object" gid="4102" x="615" y="480" width="15" height="15">
+   <properties>
+    <property name="type" value="grave1"/>
+   </properties>
+  </object>
+  <object id="28" class="object" gid="4102" x="630" y="450" width="15" height="15">
+   <properties>
+    <property name="type" value="grave1"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="4" name="Trees">
-  <object id="13" class="tree" gid="4099" x="135" y="810" width="15" height="15">
+  <object id="13" class="object" gid="4099" x="135" y="810" width="15" height="15">
    <properties>
     <property name="type" value="treedark"/>
    </properties>
   </object>
-  <object id="14" class="tree" gid="4099" x="195" y="780" width="15" height="15">
+  <object id="14" class="object" gid="4099" x="195" y="780" width="15" height="15">
    <properties>
     <property name="type" value="treedark"/>
    </properties>
   </object>
-  <object id="15" class="tree" gid="4099" x="240" y="855" width="15" height="15">
+  <object id="15" class="object" gid="4099" x="240" y="855" width="15" height="15">
    <properties>
     <property name="type" value="treedark"/>
    </properties>
   </object>
-  <object id="16" class="tree" gid="4099" x="180" y="885" width="15" height="15">
+  <object id="16" class="object" gid="4099" x="180" y="885" width="15" height="15">
    <properties>
     <property name="type" value="treedark"/>
    </properties>
   </object>
-  <object id="17" class="tree" gid="4098" x="270" y="780" width="15" height="15">
+  <object id="17" class="object" gid="4098" x="270" y="780" width="15" height="15">
    <properties>
     <property name="type" value="rock"/>
    </properties>

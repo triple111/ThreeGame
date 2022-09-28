@@ -20,6 +20,7 @@ export class Region {
         for (var i = 0; i < this.spawners.length; i++) {
             this.spawners[i].spawn();
         }
+                
         this.lastupdatetick = currentTick;
     }
 

@@ -4,7 +4,7 @@ import { MapLoader } from '/maploader.js';
 import { Region } from '/Region.js';
 
 export class ResourceManager {
-    constructor(addToScene, removeFromScene, startloop) {
+    constructor(addToScene, removeFromScene, main) {
         //---------------DEFINITIONS---------------
         this.textureindex = [
             'goblin',
@@ -18,11 +18,12 @@ export class ResourceManager {
         ];
         //---------------CALLBACKS---------------
         this.addToScene = addToScene;
-        this.startloop = startloop;
+        this.removeFromScene = removeFromScene;
+        this.main = main;
         //---------------LOADERS---------------
         this.textureloader = new THREE.TextureLoader();
         this.meshloader = new GLTFLoader();
-        this.mapLoader = new MapLoader();
+        this.mapLoader = new MapLoader(this,this.addToScene);
         //---------------TEXTURES---------------
         this.textures = new Map();
         //---------------MATERIALS---------------
@@ -98,11 +99,18 @@ export class ResourceManager {
             self.addToScene(obj);
         });
 
-        this.loadGame(5);
+        this.loadGame(4);
     }
 
     loadRegions() {
-        this.regions.push(new Region(addToScene, removeFromScene));
+        this.regions.push(new Region(this.addToScene, this.removeFromScene));
+        console.log("Loaded regions");
+        this.loadGame(5);
+    }
+
+    loadMapFile(){
+        this.mapLoader.loadMapFile(this.regions[0]);
+        this.loadGame(6);
     }
 
     loadGame(progress) {
@@ -125,8 +133,12 @@ export class ResourceManager {
                 break;
             case 4:
                 this.loadRegions();
+                break;
             case 5:
-                this.startloop();
+                this.loadMapFile();
+                break;
+            case 6:
+                this.main();
                 break;
         }
     }
